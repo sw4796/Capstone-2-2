@@ -60,7 +60,7 @@ app.get('/api/stats', (req, res) => {
   });
 });
 
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`서버가 http://localhost:${PORT} 에서 실행 중`);
   console.log('현재 로그파일 버전:', `${yyyy}${mm}${dd}_${hh}${mi}`);
