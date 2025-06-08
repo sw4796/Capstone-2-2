@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
-const BACKEND_URL = "http://localhost:4000";
+const BACKEND_URL = "capstone-2-production-6d65.up.railway.app";
 
 function App() {
   const [step, setStep] = useState("main"); // main, ad, download
