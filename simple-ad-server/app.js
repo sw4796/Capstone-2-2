@@ -22,26 +22,43 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// 로그 기록
+// 방문 기록
 app.post('/api/visit', (req, res) => {
-  fs.appendFile(visitLogFile, `${Date.now()}\n`, (err) => {
-    if (err) return res.sendStatus(500);
-    res.sendStatus(200);
-  });
+  const sessionId = req.body.sessionId || '-';
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '-';
+  fs.appendFile(
+    visitLogFile,
+    `${Date.now()},${sessionId},${ip}\n`,
+    (err) => {
+      if (err) return res.sendStatus(500);
+      res.sendStatus(200);
+    }
+  );
 });
+
+// 광고 시청 구간(진행도) 기록
 app.post('/api/ad-progress', (req, res) => {
-  const { currentTime, duration } = req.body;
-  const data = `${Date.now()},${currentTime},${duration}\n`;
+  const { sessionId = '-', currentTime, duration } = req.body;
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '-';
+  const data = `${Date.now()},${sessionId},${ip},${currentTime},${duration}\n`;
   fs.appendFile(progressLogFile, data, (err) => {
     if (err) return res.sendStatus(500);
     res.sendStatus(200);
   });
 });
+
+// 광고 끝까지 시청 완료 기록
 app.post('/api/ad-finished', (req, res) => {
-  fs.appendFile(finishedLogFile, `${Date.now()}\n`, (err) => {
-    if (err) return res.sendStatus(500);
-    res.sendStatus(200);
-  });
+  const sessionId = req.body.sessionId || '-';
+  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || '-';
+  fs.appendFile(
+    finishedLogFile,
+    `${Date.now()},${sessionId},${ip}\n`,
+    (err) => {
+      if (err) return res.sendStatus(500);
+      res.sendStatus(200);
+    }
+  );
 });
 
 // 현재 로그 통계

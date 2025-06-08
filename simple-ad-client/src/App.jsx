@@ -1,6 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
+// App.jsx 최상단
+function getSessionId() {
+  let id = window.localStorage.getItem("sessionId");
+  if (!id) {
+    id = Math.random().toString(36).slice(2) + Date.now();
+    window.localStorage.setItem("sessionId", id);
+  }
+  return id;
+}
+const sessionId = getSessionId();
+
 const BACKEND_URL = "https://capstone-2-production-6d65.up.railway.app";
 
 function App() {
@@ -8,9 +19,9 @@ function App() {
   const [adWatched, setAdWatched] = useState(false);
   const videoRef = useRef();
 
-  // 방문자 기록
+    // 방문자 기록
   useEffect(() => {
-    axios.post(`${BACKEND_URL}/api/visit`).catch(console.error);
+    axios.post(`${BACKEND_URL}/api/visit`, { sessionId }).catch(console.error);
   }, []);
 
   // 광고 시청 구간(진행도) 기록
@@ -21,7 +32,7 @@ function App() {
     if (Math.floor(currentTime) !== window.lastSentSec) {
       window.lastSentSec = Math.floor(currentTime);
       axios
-        .post(`${BACKEND_URL}/api/ad-progress`, { currentTime, duration })
+        .post(`${BACKEND_URL}/api/ad-progress`, { sessionId, currentTime, duration })
         .catch(() => {});
     }
   };
@@ -29,7 +40,7 @@ function App() {
   // 광고 끝까지 시청 완료 기록
   const handleAdEnded = () => {
     setAdWatched(true);
-    axios.post(`${BACKEND_URL}/api/ad-finished`).catch(console.error);
+    axios.post(`${BACKEND_URL}/api/ad-finished`, { sessionId }).catch(console.error);
   };
 
   return (
